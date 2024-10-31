@@ -1,20 +1,35 @@
 import { Box, Container } from "@mui/material";
 import { Header } from "../../components/header/Header";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../state/store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Affairs from "../../components/Affairs/Affairs";
 import { Tablist } from "../../components/TabList/Tablist";
+import { checkAuth } from "../../state/authSlice";
+import Auth from "../auth/Auth";
+import { Navigate } from "react-router-dom";
 
 function App() {
+  const dispath = useDispatch();
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const [activeTab, setActiveTab] = useState("current");
 
+  
+  
   const todoList = useSelector((state: RootState) => state.todos) || {todos: [], trash:[]};
-
   const currentCount = todoList.todos.filter((todo) => !todo.completed).length;
   const allCount = todoList.todos.length;
   const doneCount = todoList.todos.filter((todo) => todo.completed).length;
   const trashCount = todoList.trash.length;
+  
+  
+  useEffect(() => {
+    dispath(checkAuth())
+  },[dispath])
+
+  if (!isAuthenticated) {
+    return <Navigate to="/"/>
+  }
 
   return (
     <Container maxWidth="lg">
